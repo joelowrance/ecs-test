@@ -1,0 +1,61 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true  # Cancel superseded runs on the same branch
+
+jobs:
+  build-and-test:
+    name: Build and Test (.NET ${{ matrix.dotnet-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        dotnet-version: ['10.0.x']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run unit tests
+        run: |
+          dotnet test tests/EcsExample.Tests.Unit \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage/unit
+
+      - name: Run integration tests
+        run: |
+          dotnet test tests/EcsExample.Tests.Integration \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage/integration
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: ./coverage/
+          retention-days: 7

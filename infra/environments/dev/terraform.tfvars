@@ -1,0 +1,10 @@
+aws_region         = "us-east-1"
+environment        = "dev"
+project            = "ecs-example"
+vpc_cidr           = "10.0.0.0/16"
+single_nat_gateway = true  # Single NAT GW to reduce costs in dev
+task_cpu           = 256
+task_memory        = 512
+desired_count      = 1
+min_capacity       = 1
+max_capacity       = 2

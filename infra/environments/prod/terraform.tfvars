@@ -1,0 +1,10 @@
+aws_region         = "us-east-1"
+environment        = "prod"
+project            = "ecs-example"
+vpc_cidr           = "10.1.0.0/16"  # Different CIDR from dev to allow VPC peering if needed
+single_nat_gateway = false           # One NAT GW per AZ for high availability
+task_cpu           = 512
+task_memory        = 1024
+desired_count      = 2              # Minimum 2 tasks spread across 2 AZs
+min_capacity       = 2
+max_capacity       = 4

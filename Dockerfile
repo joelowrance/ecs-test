@@ -1,25 +1,18 @@
 # =============================================================
-# Stage 1: Restore + Build
+# Stage 1: Restore + Publish
 # =============================================================
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS publish
 WORKDIR /src
 
-# Copy project file first to leverage Docker layer caching for package restore.
-# If only source files change, this layer is reused.
+# Copy MSBuild props first to leverage Docker layer caching for package restore.
+# If only source files change, these layers are reused.
+COPY ["Directory.Packages.props", "/Directory.Packages.props"]
+COPY ["src/Directory.Build.props", "./"]
 COPY ["src/EcsExample.Api/EcsExample.Api.csproj", "EcsExample.Api/"]
 RUN dotnet restore "EcsExample.Api/EcsExample.Api.csproj"
 
-# Copy remaining source and build
+# Copy remaining source and publish in one step
 COPY src/ .
-RUN dotnet build "EcsExample.Api/EcsExample.Api.csproj" \
-    --configuration Release \
-    --no-restore \
-    --output /app/build
-
-# =============================================================
-# Stage 2: Publish
-# =============================================================
-FROM build AS publish
 RUN dotnet publish "EcsExample.Api/EcsExample.Api.csproj" \
     --configuration Release \
     --no-restore \
@@ -27,15 +20,15 @@ RUN dotnet publish "EcsExample.Api/EcsExample.Api.csproj" \
     /p:UseAppHost=false
 
 # =============================================================
-# Stage 3: Runtime image
+# Stage 2: Runtime image
 # =============================================================
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 # Create a non-root system user and group.
 # Running as root inside a container is a security anti-pattern.
-RUN addgroup --system appgroup \
- && adduser --system --ingroup appgroup --no-create-home appuser
+RUN groupadd --system appgroup \
+ && useradd --system --gid appgroup --no-create-home appuser
 
 # Copy the published output from the publish stage
 COPY --from=publish /app/publish .

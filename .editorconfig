@@ -189,6 +189,13 @@ dotnet_naming_style.underscore_camel_case_style.required_prefix = _
 dotnet_naming_style.underscore_camel_case_style.capitalization = camel_case
 
 # ============================================================
+# Test files — relax rules that conflict with xUnit conventions
+# ============================================================
+[tests/**/*.cs]
+# CA1707: xUnit uses Method_Scenario_Result naming with underscores
+dotnet_diagnostic.CA1707.severity = none
+
+# ============================================================
 # Terraform / HCL
 # ============================================================
 [*.{tf,tfvars}]

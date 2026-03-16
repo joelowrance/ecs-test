@@ -44,7 +44,7 @@ COPY --from=publish /app/publish .
 USER appuser
 
 # Tell ASP.NET Core to listen on port 8080 (non-privileged port, safe for non-root)
-ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_HTTP_PORTS=8080
 
 EXPOSE 8080
 

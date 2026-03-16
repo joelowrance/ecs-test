@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(git:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:releases.hashicorp.com)",
+      "WebFetch(domain:hub.docker.com)",
+      "WebFetch(domain:mcr.microsoft.com)",
+      "WebFetch(domain:registry.terraform.io)",
+      "Bash(cat:*)",
+      "Bash(dotnet new:*)",
+      "Bash(ls:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)"
+    ]
+  }
+}

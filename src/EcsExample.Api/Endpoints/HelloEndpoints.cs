@@ -1,8 +1,13 @@
+using System.Reflection;
+
 namespace EcsExample.Api.Endpoints;
 
 internal static class HelloEndpoints
 {
-    private const string AppVersion = "1.0.0";
+    private static readonly string AppVersion =
+        typeof(HelloEndpoints).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion ?? "unknown";
 
     public static IEndpointRouteBuilder MapHelloEndpoints(this IEndpointRouteBuilder app)
     {

@@ -8,7 +8,7 @@ public sealed class HealthCheckTests(WebApplicationFactory<Program> factory)
     [Fact]
     public async Task Liveness_ReturnsOk()
     {
-        var response = await _client.GetAsync("/health");
+        var response = await _client.GetAsync(new Uri("/health", UriKind.Relative));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -16,7 +16,7 @@ public sealed class HealthCheckTests(WebApplicationFactory<Program> factory)
     [Fact]
     public async Task Readiness_ReturnsOk_WhenHealthy()
     {
-        var response = await _client.GetAsync("/health/ready");
+        var response = await _client.GetAsync(new Uri("/health/ready", UriKind.Relative));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -24,7 +24,7 @@ public sealed class HealthCheckTests(WebApplicationFactory<Program> factory)
     [Fact]
     public async Task Readiness_ReturnsJson_WithHealthyStatus()
     {
-        var response = await _client.GetAsync("/health/ready");
+        var response = await _client.GetAsync(new Uri("/health/ready", UriKind.Relative));
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().Contain("\"status\":\"Healthy\"");
@@ -33,7 +33,7 @@ public sealed class HealthCheckTests(WebApplicationFactory<Program> factory)
     [Fact]
     public async Task Hello_ReturnsOk_WithExpectedPayload()
     {
-        var response = await _client.GetAsync("/hello");
+        var response = await _client.GetAsync(new Uri("/hello", UriKind.Relative));
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

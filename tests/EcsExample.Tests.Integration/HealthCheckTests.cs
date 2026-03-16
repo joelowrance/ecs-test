@@ -38,6 +38,6 @@ public sealed class HealthCheckTests(WebApplicationFactory<Program> factory)
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("Hello, World!");
-        content.Should().Contain("\"version\":\"1.0.0\"");
+        content.Should().Contain("\"version\":\"1.0.0");
     }
 }

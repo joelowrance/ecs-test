@@ -54,3 +54,5 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+infra/bootstrap/terraform.tfvars

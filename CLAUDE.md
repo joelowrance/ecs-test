@@ -42,13 +42,23 @@ docker run --rm -p 8080:8080 ecs-example
 
 ```bash
 # One-time bootstrap (S3 backend + DynamoDB lock table)
-cd infra/bootstrap && terraform init && terraform apply -var-file=terraform.tfvars
+# terraform.tfvars is NOT committed — create it first:
+#   aws_region        = "us-east-1"
+#   state_bucket_name = "your-unique-bucket-name-terraform-state"
+cd infra/bootstrap
+terraform init
+terraform apply -var-file terraform.tfvars
 
 # Deploy to an environment (dev or prod)
+# First, update the bucket name placeholder in infra/environments/dev/backend.tf:
+#   bucket = "<YOUR_STATE_BUCKET>"  →  bucket = "your-unique-bucket-name2-terraform-state"
 cd infra/environments/dev
+# If you get "Backend configuration changed" with a stale cached bucket name,
+# delete the local cache and reinitialize (PowerShell):
+Remove-Item -Recurse -Force .terraform
 terraform init
-terraform plan -var-file=terraform.tfvars
-terraform apply -var-file=terraform.tfvars
+terraform plan -var-file terraform.tfvars
+terraform apply -var-file terraform.tfvars
 ```
 
 ## Architecture

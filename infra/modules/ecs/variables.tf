@@ -23,11 +23,6 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "alb_security_group_id" {
-  description = "Security group ID of the ALB (ECS tasks allow ingress from this SG)"
-  type        = string
-}
-
 variable "target_group_arn" {
   description = "ARN of the ALB target group"
   type        = string

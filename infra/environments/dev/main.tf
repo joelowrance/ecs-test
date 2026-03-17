@@ -63,9 +63,8 @@ module "ecs" {
   private_subnet_ids = module.vpc.private_subnet_ids
 
   # These reference the ALB module — Terraform resolves the dependency graph.
-  alb_security_group_id = module.alb.alb_security_group_id
-  target_group_arn      = module.alb.target_group_arn
-  alb_listener_arn      = module.alb.listener_arn
+  target_group_arn = module.alb.target_group_arn
+  alb_listener_arn = module.alb.listener_arn
 
   ecr_repository_arn = module.ecr.repository_arn
 
@@ -93,8 +92,30 @@ module "alb" {
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
 
-  # The ECS module creates the ECS security group; ALB restricts egress to it.
-  ecs_security_group_id = module.ecs.ecs_security_group_id
-
   container_port = 8080
+}
+
+# ===========================================================================
+# Security Group Rules — cross-module rules added here to break the cycle
+# between the ALB and ECS modules.
+# ===========================================================================
+
+resource "aws_security_group_rule" "alb_egress_to_ecs" {
+  type                     = "egress"
+  description              = "Forward to ECS tasks on container port"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = module.alb.alb_security_group_id
+  source_security_group_id = module.ecs.ecs_security_group_id
+}
+
+resource "aws_security_group_rule" "ecs_ingress_from_alb" {
+  type                     = "ingress"
+  description              = "Container port from ALB only"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = module.ecs.ecs_security_group_id
+  source_security_group_id = module.alb.alb_security_group_id
 }

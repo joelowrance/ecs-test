@@ -58,13 +58,8 @@ resource "aws_security_group" "ecs_tasks" {
   description = "Allow inbound from ALB on container port; allow all outbound for ECR/CloudWatch"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description     = "Container port from ALB only"
-    from_port       = var.container_port
-    to_port         = var.container_port
-    protocol        = "tcp"
-    security_groups = [var.alb_security_group_id]
-  }
+  # Ingress from ALB is added via aws_security_group_rule in the environment
+  # to avoid a circular dependency with the ALB module.
 
   egress {
     description = "Allow all outbound (HTTPS for ECR, CloudWatch, Secrets Manager via NAT)"

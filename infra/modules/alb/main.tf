@@ -24,13 +24,8 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
-    description     = "Forward to ECS tasks on container port"
-    from_port       = var.container_port
-    to_port         = var.container_port
-    protocol        = "tcp"
-    security_groups = [var.ecs_security_group_id]
-  }
+  # Egress to ECS tasks is added via aws_security_group_rule in the environment
+  # to avoid a circular dependency with the ECS module.
 
   tags = {
     Name = "${var.project}-${var.environment}-alb-sg"

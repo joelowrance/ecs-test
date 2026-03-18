@@ -11,9 +11,13 @@ internal static class HelloEndpoints
 
     public static IEndpointRouteBuilder MapHelloEndpoints(this IEndpointRouteBuilder app)
     {
+#pragma warning disable CA1305
+        var message = "Hello, World! @" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:m :ss");
+#pragma warning restore CA1305
+
         app.MapGet("/hello", () =>
             Results.Ok(new HelloResponse(
-                Message: "Hello, World!",
+                Message: message,
                 Timestamp: DateTimeOffset.UtcNow,
                 Version: AppVersion
             )))

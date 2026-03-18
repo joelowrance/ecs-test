@@ -28,6 +28,7 @@ jobs:
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_DEV }}
       ECS_CLUSTER: ${{ secrets.ECS_CLUSTER_DEV }}
       ECS_SERVICE: ${{ secrets.ECS_SERVICE_DEV }}
+      ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION_DEV }}
       CONTAINER_NAME: api
 
     steps:
@@ -66,7 +67,7 @@ jobs:
       - name: Download current task definition
         run: |
           aws ecs describe-task-definition \
-            --task-definition "$ECS_SERVICE" \
+            --task-definition "$ECS_TASK_DEFINITION" \
             --query taskDefinition \
             > task-definition.json
 

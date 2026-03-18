@@ -83,7 +83,7 @@ state_bucket_name = "mycompany-ecs-example-terraform-state"
 EOF
 
 terraform init
-terraform apply -var-file=terraform.tfvars
+terraform apply -var-file terraform.tfvars
 ```
 
 ### Step 2 — Update backend.tf with the bucket name
@@ -97,8 +97,8 @@ replacing `<YOUR_STATE_BUCKET>` with the bucket name output from Step 1.
 cd infra/environments/dev
 
 terraform init
-terraform plan -var-file=terraform.tfvars
-terraform apply -var-file=terraform.tfvars
+terraform plan -var-file terraform.tfvars
+terraform apply -var-file terraform.tfvars
 ```
 
 After apply completes, Terraform outputs the ALB DNS name:
@@ -123,8 +123,8 @@ Configure these in **Settings → Secrets and variables → Actions**:
 | `ECR_REPOSITORY_DEV` | ECR repo name for dev |
 | `ECR_REPOSITORY_PROD` | ECR repo name for prod |
 | `ECS_CLUSTER_DEV` | ECS cluster name for dev |
-| `ECS_CLUSTER_DEV` | ECS cluster name for dev |
 | `ECS_SERVICE_DEV` | ECS service name for dev |
+| `ECS_TASK_DEFINITION_DEV` | ECS task definition family for dev (e.g. `ecs-example-dev`) |
 | `ECS_CLUSTER_PROD` | ECS cluster name for prod |
 | `ECS_SERVICE_PROD` | ECS service name for prod |
 
@@ -194,6 +194,40 @@ Add required reviewers to the `production` environment to enforce manual approva
 │   └── deploy-prod.yml
 ├── Dockerfile                   Multi-stage build
 └── global.json                  Pins .NET SDK version
+```
+
+## Tearing Down and Redeploying
+
+### Destroy infrastructure
+
+```bash
+cd infra/environments/dev
+terraform destroy -var-file terraform.tfvars
+```
+
+### Redeploy after destroy
+
+1. **Re-deploy infrastructure** (bootstrap survives — S3 and DynamoDB are not destroyed):
+   ```bash
+   cd infra/environments/dev
+   Remove-Item -Recurse -Force .terraform   # PowerShell
+   terraform init
+   terraform apply -var-file terraform.tfvars
+   ```
+
+2. **GitHub secrets** — no changes needed. Resource names are derived from `project` + `environment` and will be identical after re-apply.
+
+3. **Trigger a deploy** — push any commit to `main`. The `deploy-dev` workflow rebuilds the Docker image, pushes it to ECR, and updates the ECS service automatically.
+
+### Test the deployment
+
+```bash
+# Get the ALB DNS name
+terraform output alb_dns_name
+
+curl http://<alb_dns_name>/hello
+curl http://<alb_dns_name>/health
+curl http://<alb_dns_name>/health/ready
 ```
 
 ## Best Practices Implemented

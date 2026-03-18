@@ -35,8 +35,8 @@ resource "aws_iam_role" "github_actions_dev" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            # Scope to this repo and branch only
-            "token.actions.githubusercontent.com:sub" = "repo:joelowrance/ecs-test:ref:refs/heads/main"
+            # Scope to this repo only (sub changes to environment:dev when a GitHub environment is used)
+            "token.actions.githubusercontent.com:sub" = "repo:joelowrance/ecs-test:*"
           }
         }
       }

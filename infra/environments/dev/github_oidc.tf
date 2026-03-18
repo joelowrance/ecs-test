@@ -36,7 +36,7 @@ resource "aws_iam_role" "github_actions_dev" {
           }
           StringLike = {
             # Scope to this repo and branch only
-            "token.actions.githubusercontent.com:sub" = "repo:joelowrance/ecs-example:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" = "repo:joelowrance/ecs-test:ref:refs/heads/main"
           }
         }
       }
